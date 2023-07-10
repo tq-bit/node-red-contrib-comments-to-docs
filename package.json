@@ -1,0 +1,35 @@
+{
+  "name": "@tq-bit/node-red-contrib-docgen-from-comments",
+  "version": "1.0.0",
+  "description": "A node-red sidebar plugin to show your flow comments as a separate sidebar tab",
+  "main": "index.js",
+  "scripts": {
+    "release": "npm version patch --no-git-tag-version && npm publish --access public",
+    "release:minor": "npm version minor --no-git-tag-version && npm publish --access public",
+    "release:major": "npm version major --no-git-tag-version && npm publish --access public"
+  },
+  "keywords": [
+    "node-red",
+    "sidebar",
+    "documentation",
+    "markdown",
+    "comments",
+    "comments-to-documentation",
+    "comments-to-markdown",
+    "markdown-to-html"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "node-red": {
+    "version": ">=3.0.2",
+    "nodes": {
+      "docgen": "docgen/docgen.js"
+    }
+  },
+  "dependencies": {
+    "showdown": "^2.1.0"
+  }
+}

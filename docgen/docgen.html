@@ -1,0 +1,106 @@
+<!--
+	ORIGINAL LICENSE:
+  Copyright 2015 IBM Corp.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+	THIS CODEBASE IS A CLONE OF https://github.com/node-red/node-red-node-swagger
+-->
+
+<script type="text/x-red" data-template-name="docgen">
+
+</script>
+
+<script type="text/x-red" data-help-name="docgen">
+	<p></p>
+</script>
+
+<script type="text/javascript">
+	(function () {
+		const content = $('<div/>', {
+			id: 'tab-docgen-ui',
+			style: 'position: relative; padding: 0px 4px; height: 100%; overflow: hidden',
+		});
+
+		$(
+			'<div class="red-ui-sidebar-header"><button class="red-ui-button red-ui-button-small"> <i style="margin-right: 5px;" class="fa fa-refresh"></i>Refresh</button></div>'
+		)
+			.on('click', async () => await renderDocs())
+			.appendTo(content);
+
+		const body = $('<div/>', {
+			id: 'func-docgen-body',
+		}).appendTo(content);
+
+		// Add the headline and flow docs section
+		$('<div class="red-ui-sidebar-header red-ui-info-toolbar"> Tab Info</div>').appendTo(body);
+		const flowDocs = $('<div/>', {
+			id: 'flow-docgen',
+		}).appendTo(body);
+
+		// Add the headline and comment docs section
+		$(
+			'<div class="red-ui-sidebar-header red-ui-info-toolbar"> Flow Comments<div></div></div>'
+		).appendTo(body);
+		const commentDocs = $('<div/>', {
+			id: 'comment-docgen',
+		}).appendTo(body);
+
+		async function renderDocs() {
+			const res = await fetch(window.origin + '/api/docgen');
+			const nodes = await res.json();
+
+			flowDocs.empty();
+			commentDocs.empty();
+			nodes.forEach((node) => {
+				const details = $('<details class="red-ui-palette-content" style="padding: 8px 12px;">');
+
+				$(
+					`<summary style="font-size: 1.1em; margin-bottom: 0.25rem;"><b>${node.label}</b></summary>`
+				).appendTo(details);
+				$(node.html).appendTo(details);
+
+				if (node.type === 'tab' && !!node.html) {
+					details.appendTo(flowDocs);
+					$('<hr style="margin: 0"/>').appendTo(flowDocs);
+				}
+
+				if (node.type === 'comment' && !!node.html) {
+					details.appendTo(commentDocs);
+					$('<hr style="margin: 0"/>').appendTo(commentDocs);
+				}
+			});
+		}
+
+		RED.sidebar.addTab({
+			id: 'docgen-ui',
+			label: 'DocGen',
+			name: 'DocGen',
+			content: content,
+			iconClass: 'fa fa-file-text',
+		});
+
+		RED.nodes.registerType('docgen', {
+			category: 'config',
+			exclusive: true,
+			defaults: {},
+			label: function () {
+				return 'docgen';
+			},
+
+			onpaletteadd: async function () {
+				await renderDocs();
+			},
+		});
+	})();
+</script>
