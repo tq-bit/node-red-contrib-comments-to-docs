@@ -17,9 +17,7 @@
 	THIS CODEBASE IS A CLONE OF https://github.com/node-red/node-red-node-swagger
 -->
 
-<script type="text/x-red" data-template-name="docgen">
-
-</script>
+<script type="text/x-red" data-template-name="docgen"></script>
 
 <script type="text/x-red" data-help-name="docgen">
 	<p></p>
@@ -57,29 +55,34 @@
 		}).appendTo(body);
 
 		async function renderDocs() {
-			const res = await fetch(window.origin + '/api/docgen');
-			const nodes = await res.json();
+			try {
+				const res = await fetch(window.origin + '/api/docgen');
+				const nodes = await res.json();
 
-			flowDocs.empty();
-			commentDocs.empty();
-			nodes.forEach((node) => {
-				const details = $('<details class="red-ui-palette-content" style="padding: 8px 12px;">');
+				flowDocs.empty();
+				commentDocs.empty();
+				nodes.forEach((node) => {
+					const details = $('<details class="red-ui-palette-content" style="padding: 8px 12px;">');
 
-				$(
-					`<summary style="font-size: 1.1em; margin-bottom: 0.25rem;"><b>${node.label}</b></summary>`
-				).appendTo(details);
-				$(node.html).appendTo(details);
+					$(
+						`<summary style="font-size: 1.1em; margin-bottom: 0.25rem;"><b>${node.label}</b></summary>`
+					).appendTo(details);
+					$(node.html).appendTo(details);
 
-				if (node.type === 'tab' && !!node.html) {
-					details.appendTo(flowDocs);
-					$('<hr style="margin: 0"/>').appendTo(flowDocs);
-				}
+					if (node.type === 'tab' && !!node.html) {
+						details.appendTo(flowDocs);
+						$('<hr style="margin: 0"/>').appendTo(flowDocs);
+					}
 
-				if (node.type === 'comment' && !!node.html) {
-					details.appendTo(commentDocs);
-					$('<hr style="margin: 0"/>').appendTo(commentDocs);
-				}
-			});
+					if (node.type === 'comment' && !!node.html) {
+						details.appendTo(commentDocs);
+						$('<hr style="margin: 0"/>').appendTo(commentDocs);
+					}
+				});
+			} catch (error) {
+				RED.sidebar.removeTab('docgen-ui');
+				console.warn('Could not render docgen. Did you add the node to one of your flows?');
+			}
 		}
 
 		RED.sidebar.addTab({
@@ -91,8 +94,9 @@
 		});
 
 		RED.nodes.registerType('docgen', {
-			category: 'config',
+			category: 'common',
 			exclusive: true,
+			icon: 'font-awesome/fa-cogs',
 			defaults: {},
 			label: function () {
 				return 'docgen';
